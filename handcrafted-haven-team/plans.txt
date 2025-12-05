@@ -1,0 +1,93 @@
+Core Features (required by project spec)
+ 
+Seller Accounts
+ 
+    Create/edit profile
+    Add bio, avatar, banner image
+    Show all products by that seller
+ 
+Product Listings
+ 
+    Add/edit/delete products
+    Product fields: name, price, category, short description, long description, images
+ 
+Product Browsing
+ 
+    Grid layout of products
+    Filtering: category, price range, seller
+    Sorting: newest, price ascending
+ 
+Product Details Page
+ 
+    Multiple images
+    Seller info preview
+    Average rating
+    Reviews list
+ 
+Reviews & Ratings
+ 
+    Logged-in users can add ratings
+    Star rating input
+    Review moderation (optional)
+ 
+Authentication
+ 
+    Signup
+    Login
+    Logout
+    Role-based behavior (seller vs buyer)
+ 
+NAVIGATION PLAN
+Primary Navigation (header)
+ 
+Visible to all users:
+ 
+    Home
+    Browse Products
+    Categories (dropdown: pottery, textiles, jewelry, decor, etc.)
+    About / Community
+    Login / Signup (if not logged in)
+    Profile (if logged in)
+ 
+For sellers (after login):
+ 
+    Dashboard
+    My Products
+    Add Product
+ 
+For customers (after login):
+ 
+    My Account
+    Favorites (optional)
+    Cart (if you implement it)
+ 
+SITE MAP / PAGE HIERARCHY
+Public Pages
+ 
+/ — Home
+        hero section
+        featured categories
+        featured sellers
+        newsletter or community highlight
+ 
+    /products — All Products
+    /products/:id — Product Detail Page
+    /sellers/:id — Seller Profile
+    /about — About Page
+ 
+Auth Pages
+ 
+    /login
+    /signup
+ 
+Seller Pages
+ 
+    /dashboard
+    /dashboard/products
+    /dashboard/products/new
+ 
+Customer Pages
+ 
+    /account
+    /favorites (if implemented)
+    /cart (optional)
