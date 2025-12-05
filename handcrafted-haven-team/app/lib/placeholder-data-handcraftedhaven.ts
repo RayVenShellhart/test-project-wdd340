@@ -180,32 +180,38 @@ const reviews: Review[] = [
     product_id: 'a1111111-1111-1111-1111-111111111111',
     user_id: 'c1d2e3f4-1111-2222-3333-444455556666',
     content: 'Beautiful craftsmanship! Love the natural finish.',
+    rating: 5
   },
   {
     id: 'f7777777-7777-7777-7777-777777777777',
     product_id: 'b2222222-2222-2222-2222-222222222222',
     user_id: 'c2d2e3f4-1111-2222-3333-444455556667',
     content: 'The leather quality is excellent, very durable.',
+    rating: 4
   },
   {
     id: 'f8888888-8888-8888-8888-888888888888',
     product_id: 'c3333333-3333-3333-3333-333333333333',
     user_id: 'c3d2e3f4-1111-2222-3333-444455556668',
     content: 'Looks amazing on my shelf, exactly as pictured.',
+    rating: 5
   },
   {
     id: 'f9999999-9999-9999-9999-999999999999',
     product_id: 'd4444444-4444-4444-4444-444444444444',
     user_id: 'c4d2e3f4-1111-2222-3333-444455556669',
     content: 'Warm and cozy! The colors are vibrant.',
+    rating: 4
   },
   {
     id: 'f0000000-0000-0000-0000-000000000000',
     product_id: 'e5555555-5555-5555-5555-555555555555',
     user_id: 'c5d2e3f4-1111-2222-3333-444455556670',
     content: 'Lovely scent and long-lasting burn time.',
+    rating: 5
   },
 ];
+
 
  const sellerStories: SellerStory[] = [
   {

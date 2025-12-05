@@ -41,6 +41,7 @@ export type Review = {
   product_id: string; // now references Product.id
   user_id: string;    // now references User.id
   content: string;
+  rating: number;
 };
 
 export type Customer = {
