@@ -235,7 +235,7 @@ export async function updateProduct(
   id: string,
   prevState: ProductState,
   formData: FormData,
-) {
+): Promise<ProductState> {
   // Check authentication
   const session = await auth();
   
