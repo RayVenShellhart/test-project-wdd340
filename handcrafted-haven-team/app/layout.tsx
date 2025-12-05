@@ -1,7 +1,7 @@
 import '@/app/ui/global.css';
 import { inter } from '@/app/ui/fonts';
 import { Metadata } from 'next';
-import ClientProviders from '@/app/ui/ClientProviders'; // your wrapper
+import ClientProviders from '@/app/ui/ClientProviders';
 
 export const metadata: Metadata = {
   title: {
@@ -10,6 +10,30 @@ export const metadata: Metadata = {
   },
   description: 'The official Next.js Learn Dashboard built with App Router.',
   metadataBase: new URL('https://next-learn-dashboard.vercel.sh'),
+
+  openGraph: {
+    title: 'Acme Dashboard',
+    description: 'The official Next.js Learn Dashboard built with App Router.',
+    url: '/',
+    siteName: 'Acme Dashboard',
+    images: [
+      {
+        url: '/products/social_media.webp', // <-- replace with your real image path
+        width: 1276,
+        height: 956,
+        alt: 'Acme Dashboard',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Acme Dashboard',
+    description: 'The official Next.js Learn Dashboard built with App Router.',
+    images: ['/products/social_media.webp'], // <-- replace with your real image
+  },
 };
 
 export default function RootLayout({
@@ -20,7 +44,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} antialiased`}>
-        {/* Wrap children in client providers */}
         <ClientProviders>{children}</ClientProviders>
       </body>
     </html>
