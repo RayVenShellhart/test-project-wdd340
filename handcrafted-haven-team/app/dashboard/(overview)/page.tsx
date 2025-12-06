@@ -3,6 +3,7 @@ import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import CustomerDashboard from '@/app/ui/dashboard/customer-dashboard';
 import ArtisanDashboard from '@/app/ui/dashboard/artisan-dashboard';
+import { SellerStory } from '@/app/lib/definitions';
 import postgres from 'postgres';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
@@ -24,7 +25,7 @@ export default async function DashboardPage() {
   const user = session.user as SessionUser;
   const accountType = user.account_type;
 
-  // CUSTOMER DASHBOARD (unchanged)
+  // CUSTOMER DASHBOARD
   if (accountType === 'customer') {
     const products = (await sql`SELECT * FROM products`) || [];
     const featuredProduct =
@@ -51,10 +52,21 @@ export default async function DashboardPage() {
     `;
     const productCount = myProducts.length;
 
-    // Fetch the artisan's stories
-    const stories = await sql`
-      SELECT * FROM seller_stories WHERE user_id = ${user.id} ORDER BY id DESC
+    // Fetch the artisan's stories - properly typed
+    const storiesResult = await sql<SellerStory[]>`
+      SELECT id, user_id, title, story 
+      FROM seller_stories 
+      WHERE user_id = ${user.id} 
+      ORDER BY id DESC
     `;
+    
+    // Convert to array
+    const stories: SellerStory[] = Array.from(storiesResult).map(row => ({
+      id: row.id,
+      user_id: row.user_id,
+      title: row.title,
+      story: row.story,
+    }));
 
     return (
       <ArtisanDashboard
