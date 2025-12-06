@@ -56,14 +56,12 @@ export type InvoiceState = {
 };
 
 export async function createInvoice(prevState: InvoiceState, formData: FormData) {
-  // Validate form using Zod
   const validatedFields = CreateInvoiceSchema.safeParse({
     customerId: formData.get('customerId'),
     amount: formData.get('amount'),
     status: formData.get('status'),
   });
  
-  // If form validation fails, return errors early. Otherwise, continue.
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
@@ -71,25 +69,21 @@ export async function createInvoice(prevState: InvoiceState, formData: FormData)
     };
   }
  
-  // Prepare data for insertion into the database
   const { customerId, amount, status } = validatedFields.data;
   const amountInCents = amount * 100;
   const date = new Date().toISOString().split('T')[0];
  
-  // Insert data into the database
   try {
     await sql`
       INSERT INTO invoices (customer_id, amount, status, date)
       VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
     `;
   } catch (error) {
-    // If a database error occurs, return a more specific error.
     return {
       message: 'Database Error: Failed to Create Invoice.',
     };
   }
  
-  // Revalidate the cache for the invoices page and redirect the user.
   revalidatePath('/dashboard/invoices');
   redirect('/dashboard/invoices');
 }
@@ -135,43 +129,13 @@ export async function updateInvoice(
 // ------------------------------
 // DELETE INVOICE
 // ------------------------------
-
 export async function deleteInvoice(id: string) {
   await sql`DELETE FROM invoices WHERE id = ${id}`;
   revalidatePath('/dashboard/invoices');
 }
 
 // ------------------------------
-// DEFINE FORM SCHEMA
-// ------------------------------
-const ProductFormSchema = z.object({
-  id: z.string().optional(),
-  name: z.string().min(1, { message: 'Please enter a product name.' }),
-  description: z.string().min(1, { message: 'Please enter a product description.' }),
-  image_url: z.string()
-    .min(1, 'Please enter an image URL.')
-    .refine(
-      (val) => /^\/|^https?:\/\//.test(val),
-      'Use a relative path like /products/product.jpg or a full URL.'
-    ),
-  price: z.coerce.number().gt(0, { message: 'Please enter a price greater than $0.' }),
-  category: z.enum(['all', 'jewelry', 'art', 'home decor', 'clothing', 'other'], {
-    errorMap: () => ({ message: 'Please select a category.' }),
-  }),
-});
-
-
-// Derived schemas
-const CreateProductSchema = ProductFormSchema.omit({ id: true });
-const UpdateProductSchema = ProductFormSchema.pick({
-  name: true,
-  image_url: true,
-  price: true,
-  description: true,
-});
-
-// ------------------------------
-// CREATE PRODUCT
+// PRODUCT SCHEMAS
 // ------------------------------
 export type ProductState = {
   errors?: {
@@ -179,26 +143,43 @@ export type ProductState = {
     image_url?: string[];
     price?: string[];
     description?: string[];
-    category?: string[]; // <-- add this
+    category?: string[];
   };
   message?: string | null;
 };
 
-// app/lib/actions.ts
+const CreateProductSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  image_url: z.string().min(1, 'Image URL is required'),
+  price: z.string().min(1, 'Price is required'),
+  description: z.string().min(1, 'Description is required'),
+  category: z.string().min(1, 'Category is required'),
+});
+
+const UpdateProductSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  image_url: z.string().min(1, 'Image URL is required'),
+  price: z.coerce.number().gt(0, 'Price must be greater than 0'),
+  description: z.string().min(1, 'Description is required'),
+  category: z.string().min(1, 'Category is required'),
+});
+
+// ------------------------------
+// CREATE PRODUCT
+// ------------------------------
 export async function createProduct(prevState: ProductState, formData: FormData) {
-  // 1. Check authentication
+  // 1. Authentication
   const session = await auth();
   if (!session?.user?.id) {
     return { message: 'Unauthorized: You must be logged in to create products.' };
   }
 
-  // 2. Validate fields with Zod
+  // 2. Validate form data
   const validatedFields = CreateProductSchema.safeParse({
     name: formData.get('name'),
     image_url: formData.get('image_url'),
     price: formData.get('price'),
     description: formData.get('description'),
-    // ← Add category here
     category: formData.get('category'),
   });
 
@@ -212,21 +193,33 @@ export async function createProduct(prevState: ProductState, formData: FormData)
   // 3. Extract validated data
   const { name, image_url, price, description, category } = validatedFields.data;
 
-  // 4. Insert into the database
+  // 4. Convert price to CENTS (multiply by 100)
+  const priceNumber = parseFloat(price);
+  if (isNaN(priceNumber)) return { message: 'Invalid price value.' };
+  const priceInCents = Math.round(priceNumber * 100);
+
+  // 5. Insert into database
   try {
     await sql`
       INSERT INTO products (name, image_url, price, description, category, seller_id)
-      VALUES (${name}, ${image_url}, ${price}, ${description}, ${category}, ${session.user.id})
+      VALUES (
+        ${name},
+        ${image_url},
+        ${priceInCents}, 
+        ${description},
+        ${category},
+        ${session.user.id}
+      )
     `;
   } catch (error) {
+    console.error('Database error creating product:', error);
     return { message: 'Database Error: Failed to Create Product.' };
   }
 
-  // 5. Revalidate and redirect
+  // 6. Revalidate and redirect
   revalidatePath('/dashboard/products');
   redirect('/dashboard/products');
 }
-
 
 // ------------------------------
 // UPDATE PRODUCT
@@ -236,7 +229,7 @@ export async function updateProduct(
   prevState: ProductState,
   formData: FormData,
 ) {
-  // Check authentication
+  // 1. Check authentication
   const session = await auth();
   
   if (!session?.user?.id) {
@@ -245,20 +238,21 @@ export async function updateProduct(
     };
   }
 
-  // Check if user owns this product
+  // 2. Check ownership
   const isOwner = await checkProductOwnership(id, session.user.id);
-  
   if (!isOwner) {
     return {
       message: 'Forbidden: You can only update your own products.',
     };
   }
 
+  // 3. Validate fields
   const validatedFields = UpdateProductSchema.safeParse({
     name: formData.get('name'),
     image_url: formData.get('image_url'),
     price: formData.get('price'),
     description: formData.get('description'),
+    category: formData.get('category'),
   });
 
   if (!validatedFields.success) {
@@ -268,18 +262,29 @@ export async function updateProduct(
     };
   }
 
-  const { name, image_url, price, description } = validatedFields.data;
+  const { name, image_url, price, description, category } = validatedFields.data;
 
+  // 4. Convert price to CENTS (multiply by 100)
+  const priceInCents = Math.round(price * 100);
+
+  // 5. Update the product
   try {
     await sql`
       UPDATE products
-      SET name = ${name}, image_url = ${image_url}, price = ${price}, description = ${description}
+      SET 
+        name = ${name}, 
+        image_url = ${image_url}, 
+        price = ${priceInCents}, 
+        description = ${description},
+        category = ${category}
       WHERE id = ${id}
     `;
   } catch (error) {
+    console.error('Database error updating product:', error);
     return { message: 'Database Error: Failed to Update Product.' };
   }
 
+  // 6. Revalidate and redirect
   revalidatePath('/dashboard/products');
   redirect('/dashboard/products');
 }
@@ -288,14 +293,12 @@ export async function updateProduct(
 // DELETE PRODUCT
 // ------------------------------
 export async function deleteProduct(id: string) {
-  // Check authentication
   const session = await auth();
   
   if (!session?.user?.id) {
     throw new Error('Unauthorized: You must be logged in to delete products.');
   }
 
-  // Check if user owns this product
   const isOwner = await checkProductOwnership(id, session.user.id);
   
   if (!isOwner) {
@@ -314,7 +317,6 @@ export async function deleteProduct(id: string) {
 // ------------------------------
 // AUTHENTICATE
 // ------------------------------
-
 export async function authenticate(
   prevState: string | undefined,
   formData: FormData,
@@ -341,7 +343,6 @@ export async function authenticate(
 // ------------------------------
 // SUBMIT REVIEW
 // ------------------------------
-
 export async function submitReview(
   productId: string,
   content: string,
@@ -349,14 +350,12 @@ export async function submitReview(
   rating: number
 ): Promise<Review & { user_name: string }> {
   try {
-    // Insert the review
     const [review] = await sql<Review[]>`
       INSERT INTO reviews (product_id, user_id, content, rating)
       VALUES (${productId}, ${userId}, ${content}, ${rating})
       RETURNING id, product_id, user_id, content, rating;
     `;
 
-    // Fetch the user's name
     const [user] = await sql<{ name: string }[]>`
       SELECT name FROM users WHERE id = ${userId};
     `;

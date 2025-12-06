@@ -33,7 +33,11 @@ export async function fetchFilteredProducts(
 ): Promise<FormattedProductsTable[]> {
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
-  const results: FormattedProductsTable[] = await sql<FormattedProductsTable[]>`
+  // Convert min/max price to cents for comparison
+  const minPriceInCents = minPrice ? Math.round(parseFloat(minPrice) * 100) : 0;
+  const maxPriceInCents = maxPrice ? Math.round(parseFloat(maxPrice) * 100) : 999999999;
+
+  const results = await sql<FormattedProductsTable[]>`
     SELECT
       p.id,
       p.name,
@@ -46,13 +50,17 @@ export async function fetchFilteredProducts(
     WHERE
       (p.name ILIKE ${'%' + query + '%'} OR p.description ILIKE ${'%' + query + '%'})
       AND (${category} = '' OR p.category = ${category})
-      AND (${minPrice} = '' OR p.price >= ${Number(minPrice)})
-      AND (${maxPrice} = '' OR p.price <= ${Number(maxPrice)})
+      AND (${minPrice} = '' OR p.price >= ${minPriceInCents})
+      AND (${maxPrice} = '' OR p.price <= ${maxPriceInCents})
     LIMIT ${ITEMS_PER_PAGE}
     OFFSET ${offset};
   `;
 
-  return results;
+  // Convert price from cents to dollars
+  return results.map(product => ({
+    ...product,
+    price: product.price / 100,
+  }));
 }
 
 export async function fetchProductsPages(query: string) {
@@ -315,14 +323,15 @@ export async function fetchProductById(
 
     if (!product) return null;
 
-    // Fetch the reviews for this product with user names
+    // Fetch the reviews for this product with user names AND rating
     const reviewsData = await sql<{
       id: string;
       content: string;
       user_id: string;
       user_name: string;
+      rating: number;
     }[]>`
-      SELECT r.id, r.content, r.user_id, u.name AS user_name
+      SELECT r.id, r.content, r.user_id, r.rating, u.name AS user_name
       FROM reviews r
       JOIN users u ON r.user_id = u.id
       WHERE r.product_id = ${id}
@@ -335,6 +344,7 @@ export async function fetchProductById(
       product_id: id,
       user_id: r.user_id,
       content: r.content,
+      rating: r.rating, // ADD THIS
       user_name: r.user_name,
     }));
 
@@ -342,7 +352,7 @@ export async function fetchProductById(
       ...product,
       price: product.price / 100,
       reviews,
-      seller_id: product.seller_id, // Make sure this is included
+      seller_id: product.seller_id,
     };
   } catch (error) {
     console.error('Database Error in fetchProductById:', error);
