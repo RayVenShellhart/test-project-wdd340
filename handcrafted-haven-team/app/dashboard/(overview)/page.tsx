@@ -7,7 +7,6 @@ import postgres from 'postgres';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
-// Type for session user
 type SessionUser = {
   id: string;
   name: string;
@@ -18,7 +17,6 @@ type SessionUser = {
 export default async function DashboardPage() {
   const session = await auth();
 
-  // Redirect if unauthenticated
   if (!session?.user) {
     redirect('/login');
   }
@@ -26,17 +24,13 @@ export default async function DashboardPage() {
   const user = session.user as SessionUser;
   const accountType = user.account_type;
 
-  // CUSTOMER DASHBOARD
+  // CUSTOMER DASHBOARD (unchanged)
   if (accountType === 'customer') {
     const products = (await sql`SELECT * FROM products`) || [];
-
-    // Pick a random featured product (null if none)
     const featuredProduct =
       products.length > 0
         ? products[Math.floor(Math.random() * products.length)]
         : null;
-
-    // Get review count (0 if none)
     const reviewRows = (await sql`SELECT COUNT(*) FROM reviews WHERE user_id = ${user.id}`) || [];
     const reviewCount = reviewRows.length > 0 ? Number(reviewRows[0].count) : 0;
 
@@ -51,10 +45,27 @@ export default async function DashboardPage() {
 
   // ARTISAN DASHBOARD
   if (accountType === 'artisan') {
-    return <ArtisanDashboard user={user} />;
+    // Count the artisan's products
+    const myProducts = await sql`
+      SELECT * FROM products WHERE seller_id = ${user.id}
+    `;
+    const productCount = myProducts.length;
+
+    // Fetch the artisan's stories
+    const stories = await sql`
+      SELECT * FROM seller_stories WHERE user_id = ${user.id} ORDER BY id DESC
+    `;
+
+    return (
+      <ArtisanDashboard
+        user={user}
+        productCount={productCount}
+        stories={stories}
+      />
+    );
   }
 
-  // FALLBACK (unknown account type)
+  // Fallback
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold">Welcome to your dashboard</h1>

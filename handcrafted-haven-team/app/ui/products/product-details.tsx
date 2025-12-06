@@ -25,54 +25,77 @@ interface ProductDetailsTableProps {
 }
 
 export default function ProductDetailsTable({ product }: ProductDetailsTableProps) {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession(); // include status
   const user = session?.user;
 
   const [reviews, setReviews] = useState<ReviewWithName[]>(product.reviews || []);
   const [reviewContent, setReviewContent] = useState('');
   const [reviewRating, setReviewRating] = useState<number>(5); // Default 5
 
-useEffect(() => {
-  async function loadReviews() {
-    try {
-      const res = await fetch(`/api/products/${product.id}`);
-      if (!res.ok) throw new Error('Failed to fetch reviews');
-      const data = await res.json();
-      console.log('Fetched reviews:', data.reviews); // Should appear now
-      setReviews(
-        data.reviews.map((r: any) => ({
-          ...r,
-          user_name: r.user_name || `User ${r.user_id}`,
-          rating: r.rating ?? 5,
-        }))
-      );
-    } catch (err) {
-      console.error('Error loading reviews:', err);
+ useEffect(() => {
+    if (status === 'unauthenticated') {
+      setReviewContent('');
+      setReviewRating(5);
+      setReviews([]); // clear previous user's reviews if desired
     }
-  }
-  loadReviews();
+  }, [status]);
+
+  useEffect(() => {
+    async function loadReviews() {
+      try {
+        const res = await fetch(`/api/products/${product.id}`);
+        if (!res.ok) throw new Error('Failed to fetch reviews');
+        const data = await res.json();
+        console.log('Fetched reviews:', data.reviews);
+        setReviews(
+          data.reviews.map((r: any) => ({
+            ...r,
+            user_name: r.user_name || `User ${r.user_id}`,
+            rating: r.rating ?? 5,
+          }))
+        );
+      } catch (err) {
+        console.error('Error loading reviews:', err);
+      }
+    }
+    loadReviews();
   }, [product.id]);
 
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!reviewContent.trim()) return;
+  e.preventDefault();
+  if (!reviewContent.trim()) return;
 
-    if (!user?.id) {
-      alert("You must be logged in to leave a review.");
-      return;
-    }
+  // Always get the latest session user
+  const currentUser = session?.user;
 
-    try {
-      const newReview = await submitReview(product.id, reviewContent, user.id, reviewRating);
-      setReviews([{ ...newReview, user_name: user.name || `User ${user.id}`, rating: reviewRating }, ...reviews]);
-      setReviewContent('');
-      setReviewRating(5);
-    } catch (err) {
-      console.error('Error submitting review:', err);
-      alert('Failed to submit review.');
-    }
+  if (!currentUser?.id) {
+    alert("You must be logged in to leave a review.");
+    return;
+  }
+
+  try {
+    console.log('Submitting review as user:', currentUser);
+    const newReview = await submitReview(
+      product.id,
+      reviewContent,
+      currentUser.id,
+      reviewRating
+    );
+
+    setReviews([
+      { ...newReview, user_name: currentUser.name || `User ${currentUser.id}`, rating: reviewRating },
+      ...reviews
+    ]);
+
+    setReviewContent('');
+    setReviewRating(5);
+  } catch (err) {
+    console.error('Error submitting review:', err);
+    alert('Failed to submit review.');
+  }
   };
+
 
   // Helper to render stars for display
   const renderStars = (rating: number) =>
