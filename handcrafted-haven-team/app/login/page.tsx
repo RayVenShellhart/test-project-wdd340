@@ -2,22 +2,12 @@ import AcmeLogo from '@/app/ui/acme-logo';
 import LoginForm from '@/app/ui/login-form';
 import { Suspense } from 'react';
 import { Metadata } from 'next';
-import { auth } from '@/auth';      // <-- ADD THIS
-import { redirect } from 'next/navigation'; // <-- ADD THIS
  
 export const metadata: Metadata = {
   title: 'Login',
 };
 
-export default async function LoginPage() {
-  // 🔥 Check session BEFORE rendering anything
-  const session = await auth();
-
-  // 🔥 If user is already logged in, redirect away from the login page
-  if (session?.user) {
-    redirect('/dashboard');
-  }
-
+export default function LoginPage() {
   return (
     <main className="flex items-center justify-center md:h-screen">
       <div className="relative mx-auto flex w-full max-w-[400px] flex-col space-y-2.5 p-4 md:-mt-32">
