@@ -129,7 +129,7 @@ const products: Product[] = [
   {
     id: 'f6666666-6666-6666-6666-666666666666',
     name: 'Silver Pendant Necklace',
-    image_url: '/products/silver-pendant.jpg',
+    image_url: '/products/silver_necklace.jpg',
     price: 3800,
     description: 'A delicate silver pendant necklace handcrafted with precision and care.',
     category: 'jewelry',
@@ -138,7 +138,7 @@ const products: Product[] = [
   {
     id: 'a7777777-7777-7777-7777-777777777777', // Keep it in hex range
     name: 'Watercolor Print - Sunset',
-    image_url: '/products/watercolor-sunset.jpg',
+    image_url: '/products/watercolor_print.webp',
     price: 2400,
     description: 'A vibrant watercolor print of a sunset, perfect for framing and gifting.',
     category: 'art',
@@ -147,7 +147,7 @@ const products: Product[] = [
   {
     id: 'b8888888-8888-8888-8888-888888888888',
     name: 'Woolen Beanie',
-    image_url: '/products/woolen-beanie.jpg',
+    image_url: '/products/woolen_beanie.jpg',
     price: 1800,
     description: 'A soft, warm woolen beanie for cozy winter days.',
     category: 'clothing',
@@ -156,7 +156,7 @@ const products: Product[] = [
   {
     id: 'c9999999-9999-9999-9999-999999999999',
     name: 'Hand-Painted Ceramic Mug',
-    image_url: '/products/ceramic-mug.jpg',
+    image_url: '/products/handpainted_mug.jpg',
     price: 2200,
     description: 'A hand-painted ceramic mug with a unique artistic design.',
     category: 'home',
@@ -165,7 +165,7 @@ const products: Product[] = [
   {
     id: 'da000000-0000-0000-0000-000000000000',
     name: 'Leather Bookmark',
-    image_url: '/products/leather-bookmark.jpg',
+    image_url: '/products/leather_bookmark.jpg',
     price: 900,
     description: 'A handcrafted leather bookmark, perfect for readers and gift-giving.',
     category: 'other',
