@@ -1,4 +1,4 @@
-// proxy.ts
+// middleware.ts
 import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 
