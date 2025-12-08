@@ -59,7 +59,7 @@ export async function fetchFilteredProducts(
   // Convert price from cents to dollars
   return results.map(product => ({
     ...product,
-    price: product.price / 100,
+    price: product.price,
   }));
 }
 

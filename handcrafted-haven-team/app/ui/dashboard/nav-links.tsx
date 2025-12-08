@@ -3,17 +3,13 @@
 import {
   ShoppingBagIcon,
   IdentificationIcon,
-  ChatBubbleLeftRightIcon,
-  UserGroupIcon,
   HomeIcon,
-  DocumentDuplicateIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 
-// Map of links to display in the side navigation.
-// Depending on the size of the application, this would be stored in a database.
+// Same links for everyone - just Dashboard, Products, and Sellers
 const links = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Products', href: '/dashboard/products', icon: ShoppingBagIcon },
@@ -22,6 +18,7 @@ const links = [
 
 export default function NavLinks() {
   const pathname = usePathname();
+  console.log('Current links:', links); // Add this line
   return (
     <>
       {links.map((link) => {
