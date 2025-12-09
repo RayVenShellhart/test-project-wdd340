@@ -1,3 +1,5 @@
+// app/ui/products/product-details.tsx
+
 'use client';
 
 import Image from 'next/image';
@@ -26,6 +28,10 @@ interface ProductDetailsTableProps {
 export default function ProductDetailsTable({ product }: ProductDetailsTableProps) {
   const { data: session } = useSession();
   const user = session?.user;
+
+  console.log('Session data:', session);
+  console.log('User:', user);
+  console.log('User ID:', user?.id);
 
   // Initialize reviews from product prop if available
   const [reviews, setReviews] = useState<ReviewWithName[]>(product.reviews || []);

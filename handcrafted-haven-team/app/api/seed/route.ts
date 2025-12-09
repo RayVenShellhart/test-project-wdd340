@@ -1,4 +1,4 @@
-// app/api/seed/route.ts (or wherever your seed file is)
+// app/api/seed/route.ts
 // cSpell:ignore handcraftedhaven
 
 import bcryptjs from 'bcryptjs'; // Changed from bcrypt
@@ -87,7 +87,8 @@ async function seedReviews() {
       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
       product_id UUID REFERENCES products(id),
       user_id UUID REFERENCES users(id),
-      content TEXT NOT NULL
+      content TEXT NOT NULL,
+      rating INT NOT NULL
     );
   `;
 
@@ -95,8 +96,8 @@ async function seedReviews() {
 
   for (const review of reviews) {
     const result = await sql`
-      INSERT INTO reviews (id, product_id, user_id, content)
-      VALUES (${review.id}, ${review.product_id}, ${review.user_id}, ${review.content})
+      INSERT INTO reviews (id, product_id, user_id, content, rating)
+      VALUES (${review.id}, ${review.product_id}, ${review.user_id}, ${review.content}, ${review.rating})
       ON CONFLICT (id) DO NOTHING;
     `;
     inserted += result.count;
