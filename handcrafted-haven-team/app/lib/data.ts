@@ -33,7 +33,11 @@ export async function fetchFilteredProducts(
 ): Promise<FormattedProductsTable[]> {
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
-  const results: FormattedProductsTable[] = await sql<FormattedProductsTable[]>`
+  // Convert min/max price to cents for comparison
+  const minPriceInCents = minPrice ? Math.round(parseFloat(minPrice) * 100) : 0;
+  const maxPriceInCents = maxPrice ? Math.round(parseFloat(maxPrice) * 100) : 999999999;
+
+  const results = await sql<FormattedProductsTable[]>`
     SELECT
       p.id,
       p.name,
@@ -46,13 +50,17 @@ export async function fetchFilteredProducts(
     WHERE
       (p.name ILIKE ${'%' + query + '%'} OR p.description ILIKE ${'%' + query + '%'})
       AND (${category} = '' OR p.category = ${category})
-      AND (${minPrice} = '' OR p.price >= ${Number(minPrice)})
-      AND (${maxPrice} = '' OR p.price <= ${Number(maxPrice)})
+      AND (${minPrice} = '' OR p.price >= ${minPriceInCents})
+      AND (${maxPrice} = '' OR p.price <= ${maxPriceInCents})
     LIMIT ${ITEMS_PER_PAGE}
     OFFSET ${offset};
   `;
 
-  return results;
+  // Convert price from cents to dollars
+  return results.map(product => ({
+    ...product,
+    price: product.price,
+  }));
 }
 
 export async function fetchProductsPages(query: string) {
