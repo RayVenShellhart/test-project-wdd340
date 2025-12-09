@@ -32,10 +32,34 @@ export default function EditProductForm({
             defaultValue={product.name}
             className="peer block w-full rounded-md border border-gray-200 py-2 px-3 text-sm"
             aria-describedby="name-error"
+            required
           />
           <div id="name-error" aria-live="polite" aria-atomic="true">
             {state.errors?.name?.map((error: string) => (
               <p className="mt-2 text-sm text-red-500" key={error}>{error}</p>
+            ))}
+          </div>
+        </div>
+
+        {/* Description */}
+        <div className="mb-4">
+          <label htmlFor="description" className="mb-2 block text-sm font-medium">
+            Description
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            defaultValue={product.description}
+            placeholder="Enter product description"
+            className="peer block w-full rounded-md border border-gray-200 py-2 px-3 text-sm h-28 resize-none"
+            aria-describedby="description-error"
+            required
+          />
+          <div id="description-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.description?.map((error: string) => (
+              <p className="mt-2 text-sm text-red-500" key={error}>
+                {error}
+              </p>
             ))}
           </div>
         </div>
@@ -52,12 +76,16 @@ export default function EditProductForm({
             defaultValue={product.image_url}
             className="peer block w-full rounded-md border border-gray-200 py-2 px-3 text-sm"
             aria-describedby="image-error"
+            required
           />
           <div id="image-error" aria-live="polite" aria-atomic="true">
             {state.errors?.image_url?.map((error: string) => (
               <p className="mt-2 text-sm text-red-500" key={error}>{error}</p>
             ))}
           </div>
+          <p className="mt-1 text-xs text-gray-500">
+            Use a relative path like <code>/products/product.jpg</code> or a full URL.
+          </p>
         </div>
 
         {/* Price */}
@@ -73,6 +101,7 @@ export default function EditProductForm({
             defaultValue={product.price}
             className="peer block w-full rounded-md border border-gray-200 py-2 px-3 text-sm"
             aria-describedby="price-error"
+            required
           />
           <div id="price-error" aria-live="polite" aria-atomic="true">
             {state.errors?.price?.map((error: string) => (
@@ -81,21 +110,28 @@ export default function EditProductForm({
           </div>
         </div>
 
-        {/* Description - NEW */}
+        {/* Category (Restored Dropdown) */}
         <div className="mb-4">
-          <label htmlFor="description" className="mb-2 block text-sm font-medium">
-            Description
+          <label htmlFor="category" className="mb-2 block text-sm font-medium">
+            Category
           </label>
-          <textarea
-            id="description"
-            name="description"
-            defaultValue={product.description}
-            placeholder="Enter product description"
-            className="peer block w-full rounded-md border border-gray-200 py-2 px-3 text-sm h-28"
-            aria-describedby="description-error"
-          />
-          <div id="description-error" aria-live="polite" aria-atomic="true">
-            {state.errors?.description?.map((error: string) => (
+          <select
+            id="category"
+            name="category"
+            defaultValue={product.category}
+            className="peer block w-full rounded-md border border-gray-200 py-2 px-3 text-sm"
+            aria-describedby="category-error"
+            required
+          >
+            <option value="all">All</option>
+            <option value="jewelry">Jewelry</option>
+            <option value="art">Art</option>
+            <option value="home decor">Home Decor</option>
+            <option value="clothing">Clothing</option>
+            <option value="other">Other</option>
+          </select>
+          <div id="category-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.category?.map((error: string) => (
               <p className="mt-2 text-sm text-red-500" key={error}>
                 {error}
               </p>
@@ -105,6 +141,13 @@ export default function EditProductForm({
 
       </div>
 
+      {/* Error Message */}
+      {state.message && (
+        <div className="rounded-md bg-red-50 p-4">
+          <p className="text-sm text-red-800">{state.message}</p>
+        </div>
+      )}
+
       {/* Buttons */}
       <div className="mt-6 flex justify-end gap-4">
         <Link
@@ -113,7 +156,7 @@ export default function EditProductForm({
         >
           Cancel
         </Link>
-        <Button type="submit">Edit Product</Button>
+        <Button type="submit">Update Product</Button>
       </div>
     </form>
   );

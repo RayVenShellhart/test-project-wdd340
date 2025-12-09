@@ -1,10 +1,10 @@
-// proxy.ts
+// middleware.ts
 import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 
 export default auth((req) => {
   const { nextUrl } = req;
-  const user = req.auth?.user; // includes account_type from callbacks
+  const user = req.auth?.user;
 
   // Only artisans can access create page
   if (nextUrl.pathname === "/dashboard/products/create") {
