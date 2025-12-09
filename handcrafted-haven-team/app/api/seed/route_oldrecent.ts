@@ -1,15 +1,14 @@
 // app/api/seed/route.ts
 // cSpell:ignore handcraftedhaven
 
-import bcryptjs from 'bcryptjs';
+import bcryptjs from 'bcryptjs'; // Changed from bcrypt
 import postgres from 'postgres';
 import { users, products, reviews, sellerStories } from '../../lib/placeholder-data-handcraftedhaven';
-import { invoices, customers, revenue } from '../../lib/placeholder-data';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
 // ------------------------------
-// Seed Users (with account_type)
+// Seed Users
 // ------------------------------
 async function seedUsers() {
   console.log("🔄 Seeding users...");
@@ -62,6 +61,7 @@ async function seedProducts() {
   let inserted = 0;
 
   for (const product of products) {
+    // Ensure all fields are defined
     const { id, name, image_url, price, description, category, seller_id } = product;
     
     const result = await sql`
@@ -137,98 +137,6 @@ async function seedSellerStories() {
   return inserted;
 }
 
-// ------------------------------
-// Seed Customers (OLD TABLES)
-// ------------------------------
-async function seedCustomers() {
-  console.log("🔄 Seeding customers...");
-
-  await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-
-  await sql`
-    CREATE TABLE IF NOT EXISTS customers (
-      id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-      name VARCHAR(255) NOT NULL,
-      email VARCHAR(255) NOT NULL,
-      image_url VARCHAR(255) NOT NULL
-    );
-  `;
-
-  let inserted = 0;
-
-  for (const customer of customers) {
-    const result = await sql`
-      INSERT INTO customers (id, name, email, image_url)
-      VALUES (${customer.id}, ${customer.name}, ${customer.email}, ${customer.image_url})
-      ON CONFLICT (id) DO NOTHING;
-    `;
-    inserted += result.count;
-  }
-
-  console.log(`✅ Customers seeding complete. Inserted: ${inserted}`);
-  return inserted;
-}
-
-// ------------------------------
-// Seed Invoices (OLD TABLES)
-// ------------------------------
-async function seedInvoices() {
-  console.log("🔄 Seeding invoices...");
-
-  await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-
-  await sql`
-    CREATE TABLE IF NOT EXISTS invoices (
-      id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-      customer_id UUID NOT NULL,
-      amount INT NOT NULL,
-      status VARCHAR(255) NOT NULL,
-      date DATE NOT NULL
-    );
-  `;
-
-  let inserted = 0;
-
-  for (const invoice of invoices) {
-    const result = await sql`
-      INSERT INTO invoices (customer_id, amount, status, date)
-      VALUES (${invoice.customer_id}, ${invoice.amount}, ${invoice.status}, ${invoice.date})
-      ON CONFLICT (id) DO NOTHING;
-    `;
-    inserted += result.count;
-  }
-
-  console.log(`✅ Invoices seeding complete. Inserted: ${inserted}`);
-  return inserted;
-}
-
-// ------------------------------
-// Seed Revenue (OLD TABLES)
-// ------------------------------
-async function seedRevenue() {
-  console.log("🔄 Seeding revenue...");
-
-  await sql`
-    CREATE TABLE IF NOT EXISTS revenue (
-      month VARCHAR(4) NOT NULL UNIQUE,
-      revenue INT NOT NULL
-    );
-  `;
-
-  let inserted = 0;
-
-  for (const rev of revenue) {
-    const result = await sql`
-      INSERT INTO revenue (month, revenue)
-      VALUES (${rev.month}, ${rev.revenue})
-      ON CONFLICT (month) DO NOTHING;
-    `;
-    inserted += result.count;
-  }
-
-  console.log(`✅ Revenue seeding complete. Inserted: ${inserted}`);
-  return inserted;
-}
 
 // ------------------------------
 // Seed All Data
@@ -246,26 +154,20 @@ export async function GET() {
   try {
     console.log("🚀 Starting database seed...");
 
-    // Seed in order (users first, then tables that depend on users)
     const usersInserted = await seedUsers();
-    const customersInserted = await seedCustomers();
     const productsInserted = await seedProducts();
     const reviewsInserted = await seedReviews();
     const sellerStoriesInserted = await seedSellerStories();
-    const invoicesInserted = await seedInvoices();
-    const revenueInserted = await seedRevenue();
+
 
     console.log("🎉 Seed complete!");
 
     return Response.json({
       message: "Database seeded!",
       usersInserted,
-      customersInserted,
       productsInserted,
       reviewsInserted,
       sellerStoriesInserted,
-      invoicesInserted,
-      revenueInserted,
       logs
     });
   } catch (error: any) {

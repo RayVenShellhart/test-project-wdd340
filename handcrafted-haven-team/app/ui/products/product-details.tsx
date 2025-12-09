@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 
 interface ReviewWithName extends Review {
   user_name: string;
-  rating: number; // Rating 1-5
+  rating: number;
 }
 
 interface ProductDetailsTableProps {
@@ -25,18 +25,17 @@ interface ProductDetailsTableProps {
 }
 
 export default function ProductDetailsTable({ product }: ProductDetailsTableProps) {
-  const { data: session, status } = useSession(); // include status
+  const { data: session, status } = useSession();
   const user = session?.user;
 
   const [reviews, setReviews] = useState<ReviewWithName[]>(product.reviews || []);
   const [reviewContent, setReviewContent] = useState('');
-  const [reviewRating, setReviewRating] = useState<number>(5); // Default 5
+  const [reviewRating, setReviewRating] = useState<number>(5);
 
- useEffect(() => {
+  useEffect(() => {
     if (status === 'unauthenticated') {
       setReviewContent('');
       setReviewRating(5);
-      setReviews([]); // clear previous user's reviews if desired
     }
   }, [status]);
 
@@ -46,7 +45,6 @@ export default function ProductDetailsTable({ product }: ProductDetailsTableProp
         const res = await fetch(`/api/products/${product.id}`);
         if (!res.ok) throw new Error('Failed to fetch reviews');
         const data = await res.json();
-        console.log('Fetched reviews:', data.reviews);
         setReviews(
           data.reviews.map((r: any) => ({
             ...r,
@@ -61,43 +59,38 @@ export default function ProductDetailsTable({ product }: ProductDetailsTableProp
     loadReviews();
   }, [product.id]);
 
-
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!reviewContent.trim()) return;
+    e.preventDefault();
+    if (!reviewContent.trim()) return;
 
-  // Always get the latest session user
-  const currentUser = session?.user;
+    const currentUser = session?.user;
 
-  if (!currentUser?.id) {
-    alert("You must be logged in to leave a review.");
-    return;
-  }
+    if (!currentUser?.id) {
+      alert("You must be logged in to leave a review.");
+      return;
+    }
 
-  try {
-    console.log('Submitting review as user:', currentUser);
-    const newReview = await submitReview(
-      product.id,
-      reviewContent,
-      currentUser.id,
-      reviewRating
-    );
+    try {
+      const newReview = await submitReview(
+        product.id,
+        reviewContent,
+        currentUser.id,
+        reviewRating
+      );
 
-    setReviews([
-      { ...newReview, user_name: currentUser.name || `User ${currentUser.id}`, rating: reviewRating },
-      ...reviews
-    ]);
+      setReviews([
+        { ...newReview, user_name: currentUser.name || `User ${currentUser.id}`, rating: reviewRating },
+        ...reviews
+      ]);
 
-    setReviewContent('');
-    setReviewRating(5);
-  } catch (err) {
-    console.error('Error submitting review:', err);
-    alert('Failed to submit review.');
-  }
+      setReviewContent('');
+      setReviewRating(5);
+    } catch (err) {
+      console.error('Error submitting review:', err);
+      alert('Failed to submit review.');
+    }
   };
 
-
-  // Helper to render stars for display
   const renderStars = (rating: number) =>
     Array.from({ length: 5 }, (_, i) =>
       i < rating ? <span key={i} className="text-yellow-500">★</span> : <span key={i} className="text-gray-300">★</span>
@@ -107,8 +100,39 @@ export default function ProductDetailsTable({ product }: ProductDetailsTableProp
     <div className="space-y-6">
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
 
-        {/* Product Info (name, description, image, price) */}
-        {/* ...keep your existing product info here... */}
+        {/* Product Name */}
+        <div className="mb-4">
+          <h2 className="text-lg font-medium text-gray-900">Product Name</h2>
+          <p className="mt-2 text-sm text-gray-700">{product.name}</p>
+        </div>
+
+        {/* Description */}
+        {product.description && (
+          <div className="mb-4">
+            <h2 className="text-lg font-medium text-gray-900">Description</h2>
+            <p className="mt-2 text-sm text-gray-700">{product.description}</p>
+          </div>
+        )}
+
+        {/* Image */}
+        <div className="mb-4">
+          <h2 className="text-lg font-medium text-gray-900">Product Image</h2>
+          <div className="mt-2 w-48 h-48 relative rounded-md overflow-hidden border border-gray-200">
+            <Image
+              src={product.image_url || '/placeholder.jpg'}
+              alt={product.name}
+              fill
+              className="object-cover"
+              sizes="192px"
+            />
+          </div>
+        </div>
+
+        {/* Price */}
+        <div className="mb-4">
+          <h2 className="text-lg font-medium text-gray-900">Price</h2>
+          <p className="mt-2 text-sm text-gray-700">${(product.price / 100).toFixed(2)}</p>
+        </div>
 
         {/* Reviews */}
         <div className="mb-4">
@@ -133,7 +157,6 @@ export default function ProductDetailsTable({ product }: ProductDetailsTableProp
           {/* Review Form */}
           {user ? (
             <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-2">
-
               <label className="text-sm font-medium text-gray-700">Your Rating</label>
               <div className="flex gap-1">
                 {Array.from({ length: 5 }, (_, i) => {
@@ -168,8 +191,8 @@ export default function ProductDetailsTable({ product }: ProductDetailsTableProp
           ) : (
             <p className="mt-2 text-sm italic text-gray-500">Log in to leave a review.</p>
           )}
-
         </div>
+
       </div>
     </div>
   );

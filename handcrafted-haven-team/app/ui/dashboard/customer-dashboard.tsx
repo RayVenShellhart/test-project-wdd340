@@ -57,7 +57,7 @@ export default function CustomerDashboard({ user, featuredProduct, reviewCount }
                 />
               )}
               <p className="font-semibold text-lg">{featuredProduct.name}</p>
-              <p className="text-gray-700">${featuredProduct.price.toFixed(2)}</p>
+              <p className="text-gray-700">${(featuredProduct.price / 100).toFixed(2)}</p>
               {featuredProduct.description && (
                 <p className="text-sm text-gray-600 mt-1 line-clamp-2">
                   {featuredProduct.description}
