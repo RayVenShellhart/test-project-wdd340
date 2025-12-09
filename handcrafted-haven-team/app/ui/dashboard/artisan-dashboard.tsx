@@ -1,5 +1,5 @@
 // app/ui/dashboard/artisan-dashboard.tsx
-import { lusitana } from '@/app/ui/fonts';
+import { playfairDisplay } from '@/app/ui/fonts';
 import { User } from 'next-auth';
 
 interface ArtisanDashboardProps {
@@ -10,7 +10,7 @@ export default function ArtisanDashboard({ user }: ArtisanDashboardProps) {
   return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between">
-        <h1 className={`${lusitana.className} text-2xl`}>
+        <h1 className={`${playfairDisplay.className} text-2xl`}>
           Artisan Dashboard
         </h1>
       </div>
@@ -44,7 +44,7 @@ export default function ArtisanDashboard({ user }: ArtisanDashboardProps) {
       </div>
 
       <div className="mt-6">
-        <h2 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
+        <h2 className={`${playfairDisplay.className} mb-4 text-xl md:text-2xl`}>
           Recent Orders
         </h2>
         <div className="rounded-xl bg-gray-50 p-4">

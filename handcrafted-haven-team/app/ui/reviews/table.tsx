@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { lusitana } from '@/app/ui/fonts';
+import { playfairDisplay } from '@/app/ui/fonts';
 import Search from '@/app/ui/search';
 import {
   ReviewsTableType,
@@ -13,7 +13,7 @@ export default async function ReviewsTable({
 }) {
   return (
     <div className="w-full">
-      <h1 className={`${lusitana.className} mb-8 text-xl md:text-2xl`}>
+      <h1 className={`${playfairDisplay.className} mb-8 text-xl md:text-2xl`}>
         Reviews
       </h1>
       <Search placeholder="Search reviews..." />

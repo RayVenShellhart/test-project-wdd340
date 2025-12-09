@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { Metadata } from 'next';
 import { auth } from '@/auth';
 
-import { lusitana } from '@/app/ui/fonts';
+import { playfairDisplay } from '@/app/ui/fonts';
 import Search from '@/app/ui/search';
 import ProductsTable from '@/app/ui/products/table';
 import { ProductsTableSkeleton } from '@/app/ui/skeletons';
@@ -50,7 +50,7 @@ export default async function ProductsPage(props: {
 
       {/* Page Title */}
       <div className="flex w-full items-center justify-between">
-        <h1 className={`${lusitana.className} text-2xl`}>Products</h1>
+        <h1 className={`${playfairDisplay.className} text-2xl`}>Products</h1>
       </div>
 
       {/* Search + Add Product (only show button to sellers) */}

@@ -1,5 +1,5 @@
 // app/ui/dashboard/customer-dashboard.tsx
-import { lusitana } from '@/app/ui/fonts';
+import { playfairDisplay } from '@/app/ui/fonts';
 import { User } from 'next-auth';
 
 interface FeaturedProduct {
@@ -22,7 +22,7 @@ export default function CustomerDashboard({ user, featuredProduct, reviewCount }
     <div className="w-full">
       {/* Header */}
       <div className="flex w-full items-center justify-between">
-        <h1 className={`${lusitana.className} text-2xl`}>
+        <h1 className={`${playfairDisplay.className} text-2xl`}>
           Customer Dashboard
         </h1>
       </div>
