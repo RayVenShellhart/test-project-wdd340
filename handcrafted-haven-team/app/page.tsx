@@ -1,7 +1,7 @@
 import AcmeLogo from '@/app/ui/acme-logo';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import { lusitana } from '@/app/ui/fonts';
+import { inter } from '@/app/ui/fonts';
 import Image from 'next/image';
 
 export default function Page() {
@@ -16,7 +16,7 @@ export default function Page() {
           <div/>
 
 
-          <p className={`${lusitana.className} text-xl text-white md:text-3xl md:leading-normal`}>
+          <p className={`${inter.className} text-xl text-white md:text-3xl md:leading-normal`}>
             <strong>Welcome to Acme.</strong> This is the example for the{' '}
             <a href="https://nextjs.org/learn/" className="text-[#FFB703]">
               Next.js Learn Course

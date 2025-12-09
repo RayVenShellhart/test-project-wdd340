@@ -1,4 +1,5 @@
-import { lusitana } from '@/app/ui/fonts';
+// app/ui/dashboard/artisan-dashboard.tsx
+import { playfairDisplay } from '@/app/ui/fonts';
 import { User } from 'next-auth';
 
 interface SellerStory {
@@ -21,7 +22,7 @@ export default function ArtisanDashboard({
   return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between">
-        <h1 className={`${lusitana.className} text-2xl`}>
+        <h1 className={`${playfairDisplay.className} text-2xl`}>
           Artisan Dashboard
         </h1>
       </div>
@@ -47,7 +48,7 @@ export default function ArtisanDashboard({
 
       {/* Seller Stories */}
       <div className="mt-6">
-        <h2 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
+        <h2 className={`${playfairDisplay.className} mb-4 text-xl md:text-2xl`}>
           Your Stories
         </h2>
         {stories.length > 0 ? (
