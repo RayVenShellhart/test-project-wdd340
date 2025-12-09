@@ -342,20 +342,22 @@ export async function authenticate(
 // SUBMIT REVIEW
 // ------------------------------
 
+// ------------------------------
+// SUBMIT REVIEW
+// ------------------------------
 export async function submitReview(
   productId: string,
   content: string,
-  userId: string
+  userId: string,
+  rating: number
 ): Promise<Review & { user_name: string }> {
   try {
-    // Insert the review
     const [review] = await sql<Review[]>`
-      INSERT INTO reviews (product_id, user_id, content)
-      VALUES (${productId}, ${userId}, ${content})
-      RETURNING id, product_id, user_id, content;
+      INSERT INTO reviews (product_id, user_id, content, rating)
+      VALUES (${productId}, ${userId}, ${content}, ${rating})
+      RETURNING id, product_id, user_id, content, rating;
     `;
 
-    // Fetch the user's name
     const [user] = await sql<{ name: string }[]>`
       SELECT name FROM users WHERE id = ${userId};
     `;

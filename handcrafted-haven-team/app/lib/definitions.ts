@@ -41,6 +41,7 @@ export type Review = {
   product_id: string; // now references Product.id
   user_id: string;    // now references User.id
   content: string;
+  rating: number;
 };
 
 export type Customer = {
@@ -163,7 +164,7 @@ export type ReviewsTableType = {
   product_id: string;
   user_id: string;
   content: string;
-  // Add any other fields you need
+  rating: number;
 };
 
 export type FormattedReviewsTable = {
@@ -171,5 +172,5 @@ export type FormattedReviewsTable = {
   product_name: string;
   user_name: string;
   content: string;
-  // Add any other formatted fields
+  rating: number;
 };

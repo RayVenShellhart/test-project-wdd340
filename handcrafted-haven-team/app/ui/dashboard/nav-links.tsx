@@ -18,8 +18,6 @@ const links = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Products', href: '/dashboard/products', icon: ShoppingBagIcon },
   { name: 'Sellers', href: '/dashboard/sellers', icon: IdentificationIcon },
-  { name: 'Reviews', href: '/dashboard/reviews', icon: ChatBubbleLeftRightIcon },
-  { name: 'About', href: '/dashboard/about', icon: UserGroupIcon },
 ];
 
 export default function NavLinks() {
