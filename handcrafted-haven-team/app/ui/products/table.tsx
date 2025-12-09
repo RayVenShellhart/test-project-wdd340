@@ -70,7 +70,7 @@ export default async function ProductsTable({
                         </div>
                         <div className="pt-4">
                           <p className="text-xs">Price</p>
-                          <p className="font-medium">${product.price.toFixed(2)}</p>
+                          <p className="font-medium">${(product.price / 100).toFixed(2)}</p>
                         </div>
                       </Link>
                       {isOwner && (
@@ -125,7 +125,7 @@ export default async function ProductsTable({
                               />
                             </div>
                             <p className="font-medium text-gray-900">{product.name}</p>
-                            <span className="ml-6 font-medium">${product.price.toFixed(2)}</span>
+                            <span className="ml-6 font-medium">${(product.price / 100).toFixed(2)}</span>
                           </Link>
                         </td>
 

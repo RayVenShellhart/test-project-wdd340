@@ -315,14 +315,15 @@ export async function fetchProductById(
 
     if (!product) return null;
 
-    // Fetch the reviews for this product with user names
+    // Fetch the reviews for this product with user names AND rating
     const reviewsData = await sql<{
       id: string;
       content: string;
       user_id: string;
       user_name: string;
+      rating: number;
     }[]>`
-      SELECT r.id, r.content, r.user_id, u.name AS user_name
+      SELECT r.id, r.content, r.user_id, r.rating, u.name AS user_name
       FROM reviews r
       JOIN users u ON r.user_id = u.id
       WHERE r.product_id = ${id}
@@ -335,6 +336,7 @@ export async function fetchProductById(
       product_id: id,
       user_id: r.user_id,
       content: r.content,
+      rating: r.rating, 
       user_name: r.user_name,
     }));
 
