@@ -164,6 +164,7 @@ export type ReviewsTableType = {
   product_id: string;
   user_id: string;
   content: string;
+  rating: number;
 };
 
 export type FormattedReviewsTable = {
@@ -171,4 +172,5 @@ export type FormattedReviewsTable = {
   product_name: string;
   user_name: string;
   content: string;
+  rating: number;
 };

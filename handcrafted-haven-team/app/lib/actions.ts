@@ -342,29 +342,25 @@ export async function authenticate(
 // SUBMIT REVIEW
 // ------------------------------
 
+// ------------------------------
+// SUBMIT REVIEW
+// ------------------------------
 export async function submitReview(
   productId: string,
   content: string,
-  userId: string
+  userId: string,
+  rating: number
 ): Promise<Review & { user_name: string }> {
   try {
-    console.log('Submitting review with:', { productId, userId, content });
-    
-    // Insert the review
     const [review] = await sql<Review[]>`
-      INSERT INTO reviews (product_id, user_id, content)
-      VALUES (${productId}, ${userId}, ${content})
-      RETURNING id, product_id, user_id, content;
+      INSERT INTO reviews (product_id, user_id, content, rating)
+      VALUES (${productId}, ${userId}, ${content}, ${rating})
+      RETURNING id, product_id, user_id, content, rating;
     `;
 
-    console.log('Review inserted:', review);
-
-    // Fetch the user's name
     const [user] = await sql<{ name: string }[]>`
       SELECT name FROM users WHERE id = ${userId};
     `;
-
-    console.log('User fetched:', user);
 
     return {
       ...review,
@@ -372,7 +368,6 @@ export async function submitReview(
     };
   } catch (error) {
     console.error('Failed to submit review:', error);
-    console.error('Error details:', JSON.stringify(error, null, 2));
     throw new Error('Database Error: Failed to submit review.');
   }
 }
