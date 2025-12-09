@@ -112,7 +112,7 @@ export default async function ProductsPage(props: {
         <div className="flex items-end">
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+            className="w-full bg-[#ffb703] text-[#333333] hover:text-white py-2 rounded-md hover:bg-blue-700 transition"
           >
             Apply Filters
           </button>
